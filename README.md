@@ -13,6 +13,10 @@ Also, the `htgo-tts` package requires `mplayer` to be installed, or it will thro
 sudo apt install mplayer
 ```
 
+Finally, we need `ffmpeg` to increase the volume
+```bash
+sudo apt install ffmpeg
+```
 
 ## Usage 
 ### Setup

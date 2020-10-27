@@ -14,7 +14,7 @@ import (
 )
 
 const audioFolder = "audio"
-const defaultPort = 80
+const defaultPort = 1337
 const volume = 2
 
 func main() {

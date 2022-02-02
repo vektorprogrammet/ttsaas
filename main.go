@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/hegedustibor/htgo-tts"
-	"github.com/kennygrant/sanitize"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,9 +10,12 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	htgotts "github.com/hegedustibor/htgo-tts"
 )
 
 const audioFolder = "audio"
+const fileName = "speech"
 const defaultPort = 1337
 const volume = 2
 
@@ -35,31 +37,25 @@ func main() {
 
 func serveSpeech(w http.ResponseWriter, r *http.Request) {
 	addCORSHeader(w)
-
+	b, _ := io.ReadAll(r.Body)
 	urlParts := strings.Split(strings.TrimPrefix(r.URL.Path, "/"), "/")
 	if len(urlParts) < 1 {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		log.Println("Bad request")
 		return
 	}
-	sentence := sanitize.BaseName(urlParts[0])
+	sentence := string(b) 
 
-	// Save audio file to audio folder
 	speech := htgotts.Speech{Folder: audioFolder, Language: "no"}
-	err := speech.Speak(sentence)
-	if err != nil {
-		http.Error(w, "server error", http.StatusInternalServerError)
-		log.Printf("Error converting text to speech: %s\n", err)
-		return
-	}
+	speechFile, _ := speech.CreateSpeechFile(sentence,fileName)
 
-	fileURI := audioFolder + "/" + sentence + ".mp3"
-	loudFileURI := audioFolder + "/" + sentence + "LOUD" + ".mp3"
+	fileURI := speechFile
+	loudFileURI := audioFolder + "/" + fileName + "LOUD" + ".mp3"
 	cmdString := fmt.Sprintf("ffmpeg -y -i %s -filter:a \"volume=%d\" %s", fileURI, volume, loudFileURI)
-
 	cmd := exec.Command("bash", "-c", cmdString)
 	buf, err := cmd.Output()
-	if err != nil {
+	e := os.Remove(speechFile)
+	if (err != nil || e != nil) {
 		http.Error(w, "server error", http.StatusInternalServerError)
 		log.Printf("Error increasing audio volume: %s: %s\n", err, string(buf))
 		log.Printf(cmdString)

@@ -20,7 +20,9 @@ RUN apk update \
     && apk add ffmpeg \
     && apk add mplayer \
     && rm -rf /var/chache/apk/* \
-    && addgroup -S app && adduser -S app -G app
+    && mkdir -p /app/audio \
+    && addgroup -S app && adduser -S app -G app \
+    && chown -R app:app /app
 
 USER app
 
@@ -28,5 +30,6 @@ WORKDIR /app
 
 COPY --from=builder /app/ttsaas .
 
-ENTRYPOINT ["./ttsaas"]
 EXPOSE 1337
+
+ENTRYPOINT ["./ttsaas"]

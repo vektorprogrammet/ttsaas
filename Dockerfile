@@ -28,4 +28,6 @@ WORKDIR /app
 
 COPY --from=builder /app/ttsaas .
 
+EXPOSE 1337
+
 ENTRYPOINT ["./ttsaas"]

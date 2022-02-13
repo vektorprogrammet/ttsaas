@@ -46,15 +46,16 @@ func serveSpeech(w http.ResponseWriter, r *http.Request) {
     }
     sentence := string(b) 
 
+    if len(sentence) == 0 {
+         fmt.Fprintln(w, "TTSAAS is running...")
+         return
+    }
+
     speech := htgotts.Speech{Folder: audioFolder, Language: "no"}
     speechFile, err := speech.CreateSpeechFile(sentence,fileName)
     if err != nil {
 		log.Printf("CreateSpeechFile fail %v", err)
 	}
-
-    log.Println(speechFile)
-    log.Println(sentence)
-    log.Println(fileName)
 
     fileURI := speechFile
     loudFileURI := audioFolder + "/" + fileName + "LOUD" + ".mp3"
@@ -66,7 +67,6 @@ func serveSpeech(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "server error", http.StatusInternalServerError)
         log.Printf("Error increasing audio volume: %s: %s\n", err, string(buf))
         log.Printf(cmdString)
-        //log.Printf(string(buf))
         return
     }
 

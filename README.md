@@ -38,3 +38,14 @@ The api can be used as a source for audio tags. For example:
   <source src="http://localhost/hello%20world" type="audio/mpeg">
 </audio>
 ```
+
+## Docker
+
+### Build
+To build the docker image, run `docker build -t vektor/ttsaas:1.1 .`
+
+### Run
+To run the docker image, run `docker run -p 1337:1337 vektor/ttsaas:1.1`
+
+(This will map to port 1337, change portnumber (`1337:<change_me>`) to map to another port)
+
